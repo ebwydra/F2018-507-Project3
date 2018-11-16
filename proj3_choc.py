@@ -13,7 +13,7 @@ BARSCSV = 'flavors_of_cacao_cleaned.csv'
 COUNTRIESJSON = 'countries.json'
 
 
-def init_db():
+def reload_data():
     # connect to database
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
@@ -60,11 +60,6 @@ def init_db():
     cur.execute(statement)
 
     conn.commit()
-    conn.close()
-
-def insert_data():
-    conn = sqlite3.connect(DBNAME)
-    cur = conn.cursor()
 
     # get data from countries json file
     f = open(COUNTRIESJSON, 'r', encoding='utf8')
@@ -134,8 +129,7 @@ def insert_data():
     conn.commit()
     conn.close()
 
-init_db()
-insert_data()
+# reload_data()
 
 # Part 2: Implement logic to process user commands
 def process_command(command):
