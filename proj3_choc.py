@@ -35,11 +35,9 @@ def init_db():
     REF TEXT,
     ReviewDate TEXT,
     CocoaPercent REAL,
-    CompanyLocation TEXT,
     CompanyLocationId INTEGER REFERENCES Countries(Id),
     Rating REAL,
     BeanType TEXT,
-    BroadBeanOrigin TEXT,
     BroadBeanOriginId INTEGER REFERENCES Countries(Id)
     );
     '''
@@ -118,13 +116,17 @@ def insert_data():
             except:
                 id = None
             row.append(id)
+            row.pop(5)
+            row.pop(7)
+            # print(row)
             tup = tuple(row)
+            # print(tup)
             bars_tuples.append(tup)
 
     for bar in bars_tuples[1:]:
         statement = '''
-        INSERT INTO Bars (Company, SpecificBeanBarName, REF, ReviewDate, CocoaPercent, CompanyLocation, Rating, BeanType, BroadBeanOrigin, CompanyLocationId, BroadBeanOriginId)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO Bars (Company, SpecificBeanBarName, REF, ReviewDate, CocoaPercent, Rating, BeanType, CompanyLocationId, BroadBeanOriginId)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         cur.execute(statement, bar)
         conn.commit()
