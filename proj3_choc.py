@@ -173,6 +173,7 @@ def bars_function(a=None, b="ratings", c="top=10"):
 
         else:
             print("Parameter 'a' not recognized.")
+            return None
 
     if b == "ratings":
         order_col = "Rating"
@@ -180,6 +181,7 @@ def bars_function(a=None, b="ratings", c="top=10"):
         order_col = "CocoaPercent"
     else:
         print("Parameter 'b' not recognized.")
+        return None
 
     c_spl = c.split("=")
     if c_spl[0] == "top":
@@ -190,6 +192,7 @@ def bars_function(a=None, b="ratings", c="top=10"):
         n = c_spl[1]
     else:
         print("Parameter 'c' not recognized.")
+        return None
 
     conn = sqlite3.connect(DBNAME)
     cur = conn.cursor()
@@ -210,39 +213,249 @@ def bars_function(a=None, b="ratings", c="top=10"):
     
     statement += '''
     ORDER BY Bars.{} {}
-    '''.format(order_col, order)
+    LIMIT {}
+    '''.format(order_col, order, n)
 
     cur.execute(statement)
-    result = cur.fetchmany(int(n))
-    print("")
+    result = cur.fetchall()
+    # print("")
+    # for r in result:
+    #     print(r)
+    return result
+
+
+# print(len(bars_function(b="cocoa")))
+
+'''
+companies
+Description: Lists chocolate bars sellers according to the specified parameters. Only companies that sell more than 4 kinds of bars are listed in results.
+Parameters:
+country=<alpha2> | region=<name> [default: none]
+Description: Specifies a country or region within which to limit the results.
+ratings | cocoa | bars_sold [default: ratings]
+Description: Specifies whether to sort by rating, cocoa percentage, or the number of different types of bars sold
+top=<limit> | bottom=<limit> [default: top=10]
+Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
+'''
+
+def companies_function(a=None, b="ratings", c="top=10"):
+
+    if a != None:
+        a_spl = a.split("=")
+        param = a_spl[0]
+        val = a_spl[1]
+
+        if param == "country":
+            countries_col = "Alpha2"
+
+        elif param == "region":
+            countries_col = "Region"
+
+        else:
+            print("Parameter 'a' not recognized.")
+            return None
+
+    if b == "ratings":
+        last_select = "AVG(Bars.Rating)"
+    elif b == "cocoa":
+        last_select = "AVG(Bars.CocoaPercent)"
+    elif b == "bars_sold":
+        last_select = "COUNT(*)"
+    else:
+        print("Parameter 'b' not recognized.")
+        return None
+
+    c_spl = c.split("=")
+    if c_spl[0] == "top":
+        order = "DESC"
+        n = c_spl[1]
+    elif c_spl[0] == "bottom":
+        order = "ASC"
+        n = c_spl[1]
+    else:
+        print("Parameter 'c' not recognized.")
+        return None
+
+    conn = sqlite3.connect(DBNAME)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT Bars.Company, Countries.EnglishName, {}
+    FROM Bars
+    LEFT JOIN Countries
+    ON Bars.CompanyLocationId = Countries.Id
+    '''.format(last_select)
+
+    if a != None:
+        statement += '''
+        WHERE Countries.{} LIKE \"{}\"
+        '''.format(countries_col, val)
+
+    statement += '''
+    GROUP BY Bars.Company
+    HAVING COUNT(*) > 4
+    ORDER BY {} {}
+    LIMIT {}
+    '''.format(last_select, order, n)
+
+    cur.execute(statement)
+    result = cur.fetchall()
+
+    # for r in result:
+    #     print(r)
+    return result
+
+# companies_function(a="region=Europe",b="cocoa")
+
+'''
+countries
+Description: Lists countries according to specified parameters. Only countries that sell/source more than 4 kinds of bars are listed in results.
+Parameters:
+region=<name> [default: none]
+Description: Specifies a region within which to limit the results.
+sellers | sources [default: sellers]
+Description: Specifies whether to select countries based sellers or bean sources.
+ratings | cocoa | bars_sold [default: ratings]
+Description: Specifies whether to sort by rating, cocoa percentage, or the number of different types of bars sold
+top=<limit> | bottom=<limit> [default: top=10]
+Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
+'''
+
+def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
+    
+    if a!= None:
+        a_spl = a.split("=")
+        param = a_spl[0]
+        val = a_spl[1]
+
+        if param == "region":
+            countries_col = "Region"
+        else:
+            print("Parameter 'a' not recognized.")
+            return None
+
+    if b == "sellers":
+        join_col = "CompanyLocationId"
+    elif b == "sources":
+        join_col = "BroadBeanOriginId"
+    else:
+        print("Parameter 'b' not recognized.")
+        return None
+
+    if c == "ratings":
+        last_select = "AVG(Bars.Rating)"
+    elif c == "cocoa":
+        last_select = "AVG(Bars.CocoaPercent)"
+    elif c == "bars_sold":
+        last_select = "COUNT(*)"
+    else:
+        print("Parameter 'c' not recognized.")
+        return None
+
+
+    d_spl = d.split("=")
+    if d_spl[0] == "top":
+        order = "DESC"
+        n = d_spl[1]
+    elif d_spl[0] == "bottom":
+        order = "ASC"
+        n = d_spl[1]
+    else:
+        print("Parameter 'd' not recognized.")
+        return None
+
+    conn = sqlite3.connect(DBNAME)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT Countries.EnglishName, Countries.Region, {}
+    FROM Bars
+    LEFT JOIN Countries
+    ON Bars.{} = Countries.Id
+    '''.format(last_select, join_col)
+
+    if a != None:
+        statement += '''
+        WHERE Countries.{} LIKE \"{}\"
+        '''.format(countries_col, val)
+
+    statement += '''
+    GROUP BY Bars.{}
+    HAVING COUNT(*) > 4
+    ORDER BY {} {}
+    LIMIT {}
+    '''.format(join_col, last_select, order, n)
+
+    cur.execute(statement)
+    result = cur.fetchall()
+
+    # for r in result:
+    #     print(r)
+    return result
+
+# countries_function(b="sellers", c="bars_sold", d="top=3")
+
+def regions_function(b="sellers", c="ratings", d="top=10"):
+
+    if b == "sellers":
+        join_col = "CompanyLocationId"
+    elif b == "sources":
+        join_col = "BroadBeanOriginId"
+    else:
+        print("Parameter 'b' not recognized.")
+        return None
+
+    if c == "ratings":
+        last_select = "AVG(Bars.Rating)"
+    elif c == "cocoa":
+        last_select = "AVG(Bars.CocoaPercent)"
+    elif c == "bars_sold":
+        last_select = "COUNT(*)"
+    else:
+        print("Parameter 'c' not recognized.")
+        return None
+
+    d_spl = d.split("=")
+    if d_spl[0] == "top":
+        order = "DESC"
+    elif d_spl[0] == "bottom":
+        order = "ASC"
+    else:
+        print("Parameter 'c' not recognized.")
+        return None
+    if len(d_spl) == 2:
+        n = d_spl[1]
+    else:
+        print("Parameter 'd' not recognized.")
+        return None
+
+    conn = sqlite3.connect(DBNAME)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT Countries.Region, {}
+    FROM Bars
+    LEFT JOIN Countries
+    ON Bars.{} = Countries.Id
+    GROUP BY Countries.Region
+    HAVING COUNT(*) > 4
+    ORDER BY {} {}
+    LIMIT {}
+    '''.format(last_select, join_col, last_select, order, n)
+
+    cur.execute(statement)
+    result = cur.fetchall()
+
     for r in result:
         print(r)
+    return result
 
-bars_function(b="cocoa",c="top=5")
+print()
+regions_function(b="sources",c="bars_sold")
+print()
 
 def process_command(command):
-
-    words = command.split()
-
-    if len(words) > 0:
-        main_command = words[0]
-    else:
-        main_command = None
-
-    if main_command == "bars":
-        pass
-
-    elif main_command == "companies":
-        pass
-
-    elif main_command== "countries":
-        pass
-
-    elif main_command == "regions":
-        pass
-
-    else:
-        pass
+    pass
 
 
 def load_help_text():
