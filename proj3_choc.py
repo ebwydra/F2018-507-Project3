@@ -221,14 +221,8 @@ def bars_function(params_dict): # a=None, c="ratings", d="top=10"
 
     cur.execute(statement)
     result = cur.fetchall()
-    # print("")
-    # for r in result:
-    #     print(r)
-    return result
 
-# result = bars_function(a="sellcountry=US", c="cocoa", d="bottom=5")
-# for row in result:
-#     print(row)
+    return result
 
 def companies_function(params_dict): # a=None, c="ratings", d="top=10"
 
@@ -307,13 +301,7 @@ def companies_function(params_dict): # a=None, c="ratings", d="top=10"
     cur.execute(statement)
     result = cur.fetchall()
 
-    # for r in result:
-    #     print(r)
     return result
-
-# result = companies_function(a="region=Europe",c="cocoa")
-# for row in result:
-#     print(row)
 
 def countries_function(params_dict): # a=None, b="sellers", c="ratings", d="top=10"
     
@@ -400,13 +388,7 @@ def countries_function(params_dict): # a=None, b="sellers", c="ratings", d="top=
     cur.execute(statement)
     result = cur.fetchall()
 
-    # for r in result:
-    #     print(r)
     return result
-
-# result = countries_function(b="sellers", c="bars_sold", d="top=3")
-# for row in result:
-#     print(row)
 
 def regions_function(params_dict): # b="sellers", c="ratings", d="top=10"
 
@@ -471,21 +453,12 @@ def regions_function(params_dict): # b="sellers", c="ratings", d="top=10"
     cur.execute(statement)
     result = cur.fetchall()
 
-    # for r in result:
-    #     print(r)
     return result
-
-# result = regions_function(b="sources",c="bars_sold")
-# for row in result:
-#     print(row)
 
 def process_command(command):
     list_of_words = command.split()
     main_command = list_of_words[0]
     params_list = list_of_words[1:]
-
-    # print(main_command)
-    # print(params)
 
     params_dict = {}
     for param in params_list:
@@ -519,16 +492,6 @@ def process_command(command):
 
     else:
         print("Command not recognized. Please enter a valid command.")
-
-# print()
-# print(process_command("bars cocoa top=15"))
-# print()
-# print(process_command("companies ratings"))
-# print()
-# print(process_command("countries top=10"))
-# print()
-# print(process_command("regions bars_sold bottom=2"))
-
 
 def load_help_text():
     with open('help.txt') as f:
@@ -575,6 +538,7 @@ def interactive_prompt():
                 pretty_print(result)
             print()
             continue
+
 
 # Make sure nothing runs or prints out when this file is run as a module
 if __name__=="__main__":
