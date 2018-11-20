@@ -136,9 +136,10 @@ def reload_data():
 
 # Part 2: Implement logic to process user commands
 
-def bars_function(a=None, b="ratings", c="top=10"):
+def bars_function(params_dict): # a=None, c="ratings", d="top=10"
 
-    if a != None:
+    try:
+        a = params_dict['a']
         a_spl = a.split("=")
         param = a_spl[0]
         val = a_spl[1]
@@ -162,24 +163,38 @@ def bars_function(a=None, b="ratings", c="top=10"):
         else:
             print("Parameter 'a' not recognized.")
             return None
+        
+    except:
+        a = None
 
-    if b == "ratings":
+    try:
+        c = params_dict['c']
+    except:
+        c = "ratings"
+    if c == "ratings":
         order_col = "Rating"
-    elif b == "cocoa":
+    elif c == "cocoa":
         order_col = "CocoaPercent"
     else:
-        print("Parameter 'b' not recognized.")
+        print("Parameter 'c' not recognized.")
         return None
 
-    c_spl = c.split("=")
-    if c_spl[0] == "top":
+    try:
+        d = params_dict['d']
+    except:
+        d = "top=10"
+    d_spl = d.split("=")
+    if d_spl[0] == "top":
         order = "DESC"
-        n = c_spl[1]
-    elif c_spl[0] == "bottom":
+    elif d_spl[0] == "bottom":
         order = "ASC"
-        n = c_spl[1]
     else:
-        print("Parameter 'c' not recognized.")
+        print("Parameter 'd' not recognized.")
+        return None
+    try:
+        n = d_spl[1]
+    except:
+        print("Parameter 'd' not recognized.")
         return None
 
     conn = sqlite3.connect(DBNAME)
@@ -211,11 +226,14 @@ def bars_function(a=None, b="ratings", c="top=10"):
     #     print(r)
     return result
 
-# print(len(bars_function(b="cocoa")))
+# result = bars_function(a="sellcountry=US", c="cocoa", d="bottom=5")
+# for row in result:
+#     print(row)
 
-def companies_function(a=None, b="ratings", c="top=10"):
+def companies_function(params_dict): # a=None, c="ratings", d="top=10"
 
-    if a != None:
+    try:
+        a = params_dict['a']
         a_spl = a.split("=")
         param = a_spl[0]
         val = a_spl[1]
@@ -229,26 +247,39 @@ def companies_function(a=None, b="ratings", c="top=10"):
         else:
             print("Parameter 'a' not recognized.")
             return None
+    except:
+        a = None
 
-    if b == "ratings":
+    try:
+        c = params_dict['c']
+    except:
+        c = "ratings"
+    if c == "ratings":
         last_select = "AVG(Bars.Rating)"
-    elif b == "cocoa":
+    elif c == "cocoa":
         last_select = "AVG(Bars.CocoaPercent)"
-    elif b == "bars_sold":
+    elif c == "bars_sold":
         last_select = "COUNT(*)"
     else:
-        print("Parameter 'b' not recognized.")
+        print("Parameter 'c' not recognized.")
         return None
 
-    c_spl = c.split("=")
-    if c_spl[0] == "top":
+    try:
+        d = params_dict['d']
+    except:
+        d = "top=10"
+    d_spl = d.split("=")
+    if d_spl[0] == "top":
         order = "DESC"
-        n = c_spl[1]
-    elif c_spl[0] == "bottom":
+    elif d_spl[0] == "bottom":
         order = "ASC"
-        n = c_spl[1]
     else:
-        print("Parameter 'c' not recognized.")
+        print("Parameter 'd' not recognized.")
+        return None
+    try:
+        n = d_spl[1]
+    except:
+        print("Parameter 'd' not recognized.")
         return None
 
     conn = sqlite3.connect(DBNAME)
@@ -280,11 +311,14 @@ def companies_function(a=None, b="ratings", c="top=10"):
     #     print(r)
     return result
 
-# companies_function(a="region=Europe",b="cocoa")
+# result = companies_function(a="region=Europe",c="cocoa")
+# for row in result:
+#     print(row)
 
-def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
+def countries_function(params_dict): # a=None, b="sellers", c="ratings", d="top=10"
     
-    if a!= None:
+    try:
+        a = params_dict['a']
         a_spl = a.split("=")
         param = a_spl[0]
         val = a_spl[1]
@@ -294,7 +328,13 @@ def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
         else:
             print("Parameter 'a' not recognized.")
             return None
+    except:
+        a = None
 
+    try:
+        b = params_dict['b']
+    except:
+        b = "sellers"
     if b == "sellers":
         join_col = "CompanyLocationId"
     elif b == "sources":
@@ -303,6 +343,10 @@ def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
         print("Parameter 'b' not recognized.")
         return None
 
+    try:
+        c = params_dict['c']
+    except:
+        c = "ratings"
     if c == "ratings":
         last_select = "AVG(Bars.Rating)"
     elif c == "cocoa":
@@ -313,15 +357,21 @@ def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
         print("Parameter 'c' not recognized.")
         return None
 
-
+    try:
+        d = params_dict['d']
+    except:
+        d = "top=10"
     d_spl = d.split("=")
     if d_spl[0] == "top":
         order = "DESC"
-        n = d_spl[1]
     elif d_spl[0] == "bottom":
         order = "ASC"
-        n = d_spl[1]
     else:
+        print("Parameter 'd' not recognized.")
+        return None
+    try:
+        n = d_spl[1]
+    except:
         print("Parameter 'd' not recognized.")
         return None
 
@@ -354,10 +404,16 @@ def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
     #     print(r)
     return result
 
-# countries_function(b="sellers", c="bars_sold", d="top=3")
+# result = countries_function(b="sellers", c="bars_sold", d="top=3")
+# for row in result:
+#     print(row)
 
-def regions_function(b="sellers", c="ratings", d="top=10"):
+def regions_function(params_dict): # b="sellers", c="ratings", d="top=10"
 
+    try:
+        b = params_dict['b']
+    except:
+        b = "sellers"
     if b == "sellers":
         join_col = "CompanyLocationId"
     elif b == "sources":
@@ -366,6 +422,10 @@ def regions_function(b="sellers", c="ratings", d="top=10"):
         print("Parameter 'b' not recognized.")
         return None
 
+    try:
+        c = params_dict['c']
+    except:
+        c = "ratings"
     if c == "ratings":
         last_select = "AVG(Bars.Rating)"
     elif c == "cocoa":
@@ -376,17 +436,21 @@ def regions_function(b="sellers", c="ratings", d="top=10"):
         print("Parameter 'c' not recognized.")
         return None
 
+    try:
+        d = params_dict['d']
+    except:
+        d = "top=10"
     d_spl = d.split("=")
     if d_spl[0] == "top":
         order = "DESC"
     elif d_spl[0] == "bottom":
         order = "ASC"
     else:
-        print("Parameter 'c' not recognized.")
+        print("Parameter 'd' not recognized.")
         return None
-    if len(d_spl) == 2:
+    try:
         n = d_spl[1]
-    else:
+    except:
         print("Parameter 'd' not recognized.")
         return None
 
@@ -411,12 +475,55 @@ def regions_function(b="sellers", c="ratings", d="top=10"):
     #     print(r)
     return result
 
-print()
-regions_function(b="sources",c="bars_sold")
-print()
+# result = regions_function(b="sources",c="bars_sold")
+# for row in result:
+#     print(row)
 
 def process_command(command):
-    pass
+    list_of_words = command.split()
+    main_command = list_of_words[0]
+    params_list = list_of_words[1:]
+
+    # print(main_command)
+    # print(params)
+
+    params_dict = {}
+    for param in params_list:
+        if ("country" in param) or ("region" in param):
+            params_dict['a'] = param 
+
+        if ("sellers" in param) or ("sources" in param):
+            params_dict['b'] = param
+
+        if ("ratings" in param) or ("cocoa" in param) or ("bars_sold" in param):
+            params_dict['c'] = param 
+
+        if ("top" in param) or ("bottom" in param):
+            params_dict['d'] = param
+
+    if main_command == "bars": # a, c, d
+        return bars_function(params_dict)
+
+    elif main_command == "companies": # a, c, d
+        return companies_function(params_dict)
+
+    elif main_command == "countries": # a, b, c, d
+        return countries_function(params_dict)
+
+    elif main_command == "regions": # b, c, d
+        return regions_function(params_dict)
+
+    else:
+        print("Command not recognized. Please enter a valid command.")
+
+# print()
+# print(process_command("bars cocoa top=15"))
+# print()
+# print(process_command("companies ratings"))
+# print()
+# print(process_command("countries top=10"))
+# print()
+# print(process_command("regions bars_sold bottom=2"))
 
 
 def load_help_text():
