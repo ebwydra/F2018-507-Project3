@@ -492,14 +492,18 @@ def process_command(command):
         if ("country" in param) or ("region" in param):
             params_dict['a'] = param 
 
-        if ("sellers" in param) or ("sources" in param):
+        elif ("sellers" in param) or ("sources" in param):
             params_dict['b'] = param
 
-        if ("ratings" in param) or ("cocoa" in param) or ("bars_sold" in param):
+        elif ("ratings" in param) or ("cocoa" in param) or ("bars_sold" in param):
             params_dict['c'] = param 
 
-        if ("top" in param) or ("bottom" in param):
+        elif ("top" in param) or ("bottom" in param):
             params_dict['d'] = param
+
+        else:
+            print("Command not recognized. Please enter a valid command.")
+            return None
 
     if main_command == "bars": # a, c, d
         return bars_function(params_dict)
@@ -530,9 +534,27 @@ def load_help_text():
     with open('help.txt') as f:
         return f.read()
 
+def pretty_print(tuple_list):
+    for tup in tuple_list:
+
+        result_list=[]
+
+        for item in tup:
+            try:
+                item = round(item, 1)
+                fw_item = "{:5.5}".format(str(item))
+                result_list.append(fw_item)
+            except:
+                item = item
+                fw_item = "{:12.12}".format(str(item))
+                result_list.append(fw_item)
+
+        print(" | ".join(result_list))
+
 # Part 3: Implement interactive prompt. We've started for you!
 def interactive_prompt():
     help_text = load_help_text()
+    print("\nWelcome to the interactive chocolate tool!\nEnter a command to get started, 'help' for help, or 'exit' to exit.\n")
     response = ''
     while response != 'exit':
         response = input('Enter a command: ')
@@ -541,6 +563,19 @@ def interactive_prompt():
             print(help_text)
             continue
 
-# # Make sure nothing runs or prints out when this file is run as a module
-# if __name__=="__main__":
-#     interactive_prompt()
+        elif response == 'exit':
+                print("Goodbye! Thanks for using the interactive chocolate tool.\n")
+
+        elif len(response.split()) < 1:
+            continue
+            
+        else:
+            result = process_command(response)
+            if result is not None:
+                pretty_print(result)
+            print()
+            continue
+
+# Make sure nothing runs or prints out when this file is run as a module
+if __name__=="__main__":
+    interactive_prompt()
