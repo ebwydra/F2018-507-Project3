@@ -136,18 +136,6 @@ def reload_data():
 
 # Part 2: Implement logic to process user commands
 
-'''
-bars
-Description: Lists chocolate bars, according the specified parameters.
-Parameters:
-sellcountry=<alpha2> | sourcecountry=<alpha2> | sellregion=<name> | sourceregion=<name> [default: none]
-Description: Specifies a country or region within which to limit the results, and also specifies whether to limit by the seller (or manufacturer) or by the bean origin source.
-ratings | cocoa [default: ratings]
-Description: Specifies whether to sort by rating or cocoa percentage
-top=<limit> | bottom=<limit> [default: top=10]
-Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
-'''
-
 def bars_function(a=None, b="ratings", c="top=10"):
 
     if a != None:
@@ -223,20 +211,7 @@ def bars_function(a=None, b="ratings", c="top=10"):
     #     print(r)
     return result
 
-
 # print(len(bars_function(b="cocoa")))
-
-'''
-companies
-Description: Lists chocolate bars sellers according to the specified parameters. Only companies that sell more than 4 kinds of bars are listed in results.
-Parameters:
-country=<alpha2> | region=<name> [default: none]
-Description: Specifies a country or region within which to limit the results.
-ratings | cocoa | bars_sold [default: ratings]
-Description: Specifies whether to sort by rating, cocoa percentage, or the number of different types of bars sold
-top=<limit> | bottom=<limit> [default: top=10]
-Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
-'''
 
 def companies_function(a=None, b="ratings", c="top=10"):
 
@@ -306,20 +281,6 @@ def companies_function(a=None, b="ratings", c="top=10"):
     return result
 
 # companies_function(a="region=Europe",b="cocoa")
-
-'''
-countries
-Description: Lists countries according to specified parameters. Only countries that sell/source more than 4 kinds of bars are listed in results.
-Parameters:
-region=<name> [default: none]
-Description: Specifies a region within which to limit the results.
-sellers | sources [default: sellers]
-Description: Specifies whether to select countries based sellers or bean sources.
-ratings | cocoa | bars_sold [default: ratings]
-Description: Specifies whether to sort by rating, cocoa percentage, or the number of different types of bars sold
-top=<limit> | bottom=<limit> [default: top=10]
-Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
-'''
 
 def countries_function(a=None, b="sellers", c="ratings", d="top=10"):
     
@@ -446,8 +407,8 @@ def regions_function(b="sellers", c="ratings", d="top=10"):
     cur.execute(statement)
     result = cur.fetchall()
 
-    for r in result:
-        print(r)
+    # for r in result:
+    #     print(r)
     return result
 
 print()
