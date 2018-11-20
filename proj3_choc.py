@@ -114,13 +114,16 @@ def reload_data():
             row.pop(5)
             row.pop(7)
             # print(row)
+            new_cocoa_percent = row[4].strip("%")
+            row.pop(4)
+            row.append(new_cocoa_percent)
             tup = tuple(row)
             # print(tup)
             bars_tuples.append(tup)
 
     for bar in bars_tuples[1:]:
         statement = '''
-        INSERT INTO Bars (Company, SpecificBeanBarName, REF, ReviewDate, CocoaPercent, Rating, BeanType, CompanyLocationId, BroadBeanOriginId)
+        INSERT INTO Bars (Company, SpecificBeanBarName, REF, ReviewDate, Rating, BeanType, CompanyLocationId, BroadBeanOriginId, CocoaPercent)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         cur.execute(statement, bar)
@@ -132,6 +135,91 @@ def reload_data():
 # reload_data()
 
 # Part 2: Implement logic to process user commands
+
+'''
+bars
+Description: Lists chocolate bars, according the specified parameters.
+Parameters:
+sellcountry=<alpha2> | sourcecountry=<alpha2> | sellregion=<name> | sourceregion=<name> [default: none]
+Description: Specifies a country or region within which to limit the results, and also specifies whether to limit by the seller (or manufacturer) or by the bean origin source.
+ratings | cocoa [default: ratings]
+Description: Specifies whether to sort by rating or cocoa percentage
+top=<limit> | bottom=<limit> [default: top=10]
+Description: Specifies whether to list the top <limit> matches or the bottom <limit> matches.
+'''
+
+def bars_function(a=None, b="ratings", c="top=10"):
+
+    if a != None:
+        a_spl = a.split("=")
+        param = a_spl[0]
+        val = a_spl[1]
+
+        if param == "sellcountry":
+            which_table = "CompanyLocation"
+            countries_col = "Alpha2"
+
+        elif param == "sourcecountry":
+            which_table = "OriginLocation"
+            countries_col = "Alpha2"
+
+        elif param == "sellregion":
+            which_table = "CompanyLocation"
+            countries_col = "Region"
+
+        elif param == "sourceregion":
+            which_table = "OriginLocation"
+            countries_col = "Region"
+
+        else:
+            print("Parameter 'a' not recognized.")
+
+    if b == "ratings":
+        order_col = "Rating"
+    elif b == "cocoa":
+        order_col = "CocoaPercent"
+    else:
+        print("Parameter 'b' not recognized.")
+
+    c_spl = c.split("=")
+    if c_spl[0] == "top":
+        order = "DESC"
+        n = c_spl[1]
+    elif c_spl[0] == "bottom":
+        order = "ASC"
+        n = c_spl[1]
+    else:
+        print("Parameter 'c' not recognized.")
+
+    conn = sqlite3.connect(DBNAME)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT Bars.SpecificBeanBarName, Bars.Company, CompanyLocation.EnglishName, Bars.Rating, Bars.CocoaPercent, OriginLocation.EnglishName
+    FROM Bars
+    LEFT JOIN Countries as CompanyLocation
+    ON Bars.CompanyLocationId = CompanyLocation.Id
+    LEFT JOIN Countries as OriginLocation
+    ON Bars.BroadBeanOriginId = OriginLocation.Id
+    '''
+    
+    if a != None:
+        statement += '''
+        WHERE {}.{} LIKE \"{}\"
+        '''.format(which_table, countries_col, val)
+    
+    statement += '''
+    ORDER BY Bars.{} {}
+    '''.format(order_col, order)
+
+    cur.execute(statement)
+    result = cur.fetchmany(int(n))
+    print("")
+    for r in result:
+        print(r)
+
+bars_function(b="cocoa",c="top=5")
+
 def process_command(command):
 
     words = command.split()
