@@ -463,7 +463,7 @@ def regions_function(params_dict): # b="sellers", c="ratings", d="top=10"
     LEFT JOIN Countries
     ON Bars.{} = Countries.Id
     GROUP BY Countries.Region
-    HAVING COUNT(*) > 4
+    HAVING COUNT(*) > 4 AND Countries.Region NOT NULL
     ORDER BY {} {}
     LIMIT {}
     '''.format(last_select, join_col, last_select, order, n)
