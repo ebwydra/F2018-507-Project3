@@ -2,8 +2,6 @@ import unittest
 from proj3_choc import *
 
 class TestDatabase(unittest.TestCase):
-    def setUp(self):
-        reload_data()
 
     def test_bar_table(self):
         conn = sqlite3.connect(DBNAME)

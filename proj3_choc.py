@@ -81,14 +81,14 @@ def reload_data():
         # read bars data in from csv
     bars_tuples = []
 
-    with open(BARSCSV) as bars_data: # Company, SpecificBeanBarName, REF, ReviewDate, CocoaPercent, CompanyLocation, Rating, BeanType, BroadBeanOrigin
+    with open(BARSCSV, encoding='utf-8') as bars_data: # Company, SpecificBeanBarName, REF, ReviewDate, CocoaPercent, CompanyLocation, Rating, BeanType, BroadBeanOrigin
         csv_reader = csv.reader(bars_data)
         for row in csv_reader:
             # row[5] - CompanyLocation
             statement = '''
             SELECT Id
             FROM Countries
-            WHERE EnglishName = \"{}\"
+            WHERE EnglishName LIKE \"{}\"
             '''.format(row[5])
             cur.execute(statement)
             result = cur.fetchone()
@@ -102,7 +102,7 @@ def reload_data():
             statement = '''
             SELECT Id
             FROM Countries
-            WHERE EnglishName = \"{}\"
+            WHERE EnglishName LIKE \"{}\"
             '''.format(row[8])
             cur.execute(statement)
             result = cur.fetchone()
@@ -131,8 +131,6 @@ def reload_data():
 
     conn.commit()
     conn.close()
-
-# reload_data()
 
 # Part 2: Implement logic to process user commands
 
@@ -163,7 +161,7 @@ def bars_function(params_dict): # a=None, c="ratings", d="top=10"
         else:
             print("Parameter 'a' not recognized.")
             return None
-        
+
     except:
         a = None
 
@@ -208,12 +206,12 @@ def bars_function(params_dict): # a=None, c="ratings", d="top=10"
     LEFT JOIN Countries as OriginLocation
     ON Bars.BroadBeanOriginId = OriginLocation.Id
     '''
-    
+
     if a != None:
         statement += '''
         WHERE {}.{} LIKE \"{}\"
         '''.format(which_table, countries_col, val)
-    
+
     statement += '''
     ORDER BY Bars.{} {}
     LIMIT {}
@@ -304,7 +302,7 @@ def companies_function(params_dict): # a=None, c="ratings", d="top=10"
     return result
 
 def countries_function(params_dict): # a=None, b="sellers", c="ratings", d="top=10"
-    
+
     try:
         a = params_dict['a']
         a_spl = a.split("=")
@@ -463,13 +461,13 @@ def process_command(command):
     params_dict = {}
     for param in params_list:
         if ("country" in param) or ("region" in param):
-            params_dict['a'] = param 
+            params_dict['a'] = param
 
         elif ("sellers" in param) or ("sources" in param):
             params_dict['b'] = param
 
         elif ("ratings" in param) or ("cocoa" in param) or ("bars_sold" in param):
-            params_dict['c'] = param 
+            params_dict['c'] = param
 
         elif ("top" in param) or ("bottom" in param):
             params_dict['d'] = param
@@ -527,11 +525,11 @@ def interactive_prompt():
             continue
 
         elif response == 'exit':
-                print("Goodbye! Thanks for using the interactive chocolate tool.\n")
+                print("Goodbye! Thanks for using the interactive chocolate tool.")
 
         elif len(response.split()) < 1:
             continue
-            
+
         else:
             result = process_command(response)
             if result is not None:
@@ -542,4 +540,5 @@ def interactive_prompt():
 
 # Make sure nothing runs or prints out when this file is run as a module
 if __name__=="__main__":
+    reload_data()
     interactive_prompt()
